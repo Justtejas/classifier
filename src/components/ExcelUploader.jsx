@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import * as XLSX from 'xlsx';
 import { FiUploadCloud, FiCheckSquare, FiSquare } from 'react-icons/fi';
+import { classifyExcelFile } from '../service/apiService';
 
 const ExcelUploader = () => {
     const [parsedData, setParsedData] = useState([]);
@@ -70,19 +71,31 @@ const ExcelUploader = () => {
     };
 
 
-    const processSelectedFields = () => {
+    const processSelectedFields = async () => {
         if (selectedFields.length === 0) {
             alert('Please select at least one field to process');
             return;
         }
 
-        // const processedData = parsedData.map(row => {
-        //     return selectedFields.reduce((acc, field) => {
-        //         acc[field] = row[field];
-        //         return acc;
-        //     }, {});
-        // });
+        try {
+            const fileInput = document.querySelector('input[type="file"]');
+            const file = fileInput.files[0];
 
+            const processedBlob = await classifyExcelFile(file, selectedFields);
+
+            const url = window.URL.createObjectURL(processedBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'processed_file.xlsx');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+
+            alert('File processed successfully!');
+        } catch (error) {
+            alert(error.message);
+        }
         console.log('Processed Data:', selectedFields);
         alert("processed data")
     };
