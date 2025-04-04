@@ -8,7 +8,7 @@ export const classifyExcelFile = async (file, selectedFields) => {
     });
 
     try {
-        const response = await axios.post('http://localhost:9092/api/classify', formData, {
+        const response = await axios.post('http://localhost:9092/api/filee', formData, {
             responseType: 'blob',
         });
         return response.data;
