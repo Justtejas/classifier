@@ -24,6 +24,18 @@ const ExcelUploader = () => {
     const fileInputRef = useRef(null);
     const timerIntervalRef = useRef(null);
 
+    const formatTime = (seconds) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const formatDecimalTime = (totalSeconds) => {
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = (totalSeconds % 60).toFixed(2);
+      return `${mins}:${secs.padStart(5, '0')}`;
+  };
+
     const handleFileUpload = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -150,7 +162,7 @@ const ExcelUploader = () => {
             <div className="bg-white p-6 rounded-lg shadow-lg flex items-center space-x-3">
                 <FiLoader className="animate-spin text-blue-600 w-6 h-6" />
                 <span className="text-gray-700">Processing your file...</span>
-                <span className="text-gray-500 ml-4">Elapsed Time: {timer} seconds</span>
+                <span className="text-gray-500 ml-4">Elapsed Time: {formatTime(timer)}</span>
             </div>
         </div>
     );
@@ -170,7 +182,7 @@ const ExcelUploader = () => {
                 {icon}
                 <span>{message}</span>
                 {processingTime > 0 && messageType === 'success' && (
-                    <span className="ml-4 text-sm text-gray-600">Time Taken: {processingTime} seconds</span>
+                    <span className="ml-4 text-sm text-gray-600">Time Taken: {formatDecimalTime(processingTime)}</span>
                 )}
                 <button
                     onClick={closeMessageBanner}
