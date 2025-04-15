@@ -134,12 +134,18 @@ const ExcelUploader = () => {
         const startTime = performance.now();
         try {
             const file = fileInputRef.current.files[0];
+
+            // Generate processed filename
+            const originalName = file.name;
+            const processedName = originalName.replace(/(\.[^/.]+)?$/, (match) => `_processed${match || ''}`
+        );
+
             const processedBlob = await classifyExcelFile(file, selectedFields);
 
             const url = window.URL.createObjectURL(processedBlob);
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'processed_file.xlsx');
+            link.setAttribute('download', processedName);
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -150,7 +156,7 @@ const ExcelUploader = () => {
             setProcessingTime(((endTime - startTime) / 1000).toFixed(2));
             showMessage('File processed successfully!', 'success');
         } catch (error) {
-            showMessage(error.message, 'error');
+            showMessage(error.message || 'Processing failed', 'error');
         } finally {
             stopTimer();
             setLoading(false);
