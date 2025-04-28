@@ -289,6 +289,7 @@ const ExcelUploader = () => {
                     <FiSquare className="w-5 h-5 mr-2 text-gray-400 group-hover:text-blue-400" />
                   )}
                 </span>
+                {/*truncate*/}
                 <span className="text-sm font-medium">{header}</span>
               </button>
             ))}
