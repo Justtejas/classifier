@@ -22,10 +22,39 @@ const ExcelUploader = () => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [processingTime, setProcessingTime] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [originalFileName, setOriginalFileName] = useState('');
+  const [processedFileUrl, setProcessedFileUrl] = useState('');
   const [timer, setTimer] = useState(0);
   const fileInputRef = useRef(null);
   const timerIntervalRef = useRef(null);
 
+  const DownloadModal = ({ isOpen, onClose, processingTime, onDownload }) => {
+    if (!isOpen) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white p-16 rounded-xl shadow-xl flex flex-col items-center">
+          <h2 className="text-lg font-semibold">File Processed Successfully!</h2>
+          <p className="mt-2">Time Taken: {processingTime} seconds</p>
+          <div className="mt-4 flex space-x-4">
+            <button
+              onClick={onDownload}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            >
+              Download
+            </button>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -38,6 +67,19 @@ const ExcelUploader = () => {
     return `${mins}:${secs.padStart(5, '0')}`;
   };
 
+  const handleDownload = () => {
+    const link = document.createElement('a');
+    link.href = processedFileUrl;
+    const baseName = originalFileName.split('.').slice(0, -1).join('.');
+    const processedFileName = `${baseName}_processed_file.xlsx`;
+    link.setAttribute('download', processedFileName);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(processedFileUrl);
+    resetState();
+    setIsModalOpen(false);
+  };
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -136,24 +178,15 @@ const ExcelUploader = () => {
     const startTime = performance.now();
     try {
       const file = fileInputRef.current.files[0];
-      const originalName = file.name;
-      const processedName = originalName.replace(/(\.[^/.]+)?$/, (match) => `_processed${match || ''}`);
-
+      setOriginalFileName(file.name)
       const processedBlob = await classifyExcelFile(file, selectedFields);
-
       const url = window.URL.createObjectURL(processedBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', processedName);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      setProcessedFileUrl(url); // Store the processed file URL
 
-      resetState();
       const endTime = performance.now();
       setProcessingTime(((endTime - startTime) / 1000).toFixed(2));
       showMessage('File processed successfully!', 'success');
+      setIsModalOpen(true); // Open the modal
     } catch (error) {
       showMessage(error.message || 'Processing failed', 'error');
     } finally {
@@ -177,16 +210,15 @@ const ExcelUploader = () => {
   const MessageBanner = () => {
     if (!message) return null;
 
-    const icon = messageType === 'success' 
-      ? <FiCheckCircle className="w-5 h-5 mr-2" /> 
+    const icon = messageType === 'success'
+      ? <FiCheckCircle className="w-5 h-5 mr-2" />
       : <FiAlertCircle className="w-5 h-5 mr-2" />;
 
     return (
-      <div className={`fixed top-6 left-1/2 transform -translate-x-1/2 flex items-center px-6 py-3 rounded-lg shadow-lg border ${
-        messageType === 'success' 
-          ? 'bg-green-50 border-green-200 text-green-800' 
-          : 'bg-red-50 border-red-200 text-red-800'
-      } animate-fade-in-down`}>
+      <div className={`fixed top-6 left-1/2 transform -translate-x-1/2 flex items-center px-6 py-3 rounded-lg shadow-lg border ${messageType === 'success'
+        ? 'bg-green-50 border-green-200 text-green-800'
+        : 'bg-red-50 border-red-200 text-red-800'
+        } animate-fade-in-down`}>
         {icon}
         <span>{message}</span>
         {processingTime > 0 && messageType === 'success' && (
@@ -206,6 +238,12 @@ const ExcelUploader = () => {
     <div className="max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-lg relative border border-gray-100">
       <MessageBanner />
       {loading && <Loader />}
+      <DownloadModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        processingTime={processingTime}
+        onDownload={handleDownload}
+      />
 
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -276,11 +314,10 @@ const ExcelUploader = () => {
               <button
                 key={header}
                 onClick={() => toggleField(header)}
-                className={`flex items-center p-3 rounded-lg border transition-all duration-200 ${
-                  selectedFields.includes(header)
-                    ? 'bg-blue-50 border-blue-300 text-blue-700 shadow-inner'
-                    : 'bg-white border-gray-200 hover:border-blue-200 text-gray-600 hover:bg-gray-50'
-                } group`}
+                className={`flex items-center p-3 rounded-lg border transition-all duration-200 ${selectedFields.includes(header)
+                  ? 'bg-blue-50 border-blue-300 text-blue-700 shadow-inner'
+                  : 'bg-white border-gray-200 hover:border-blue-200 text-gray-600 hover:bg-gray-50'
+                  } group`}
               >
                 <span className={`transition-transform duration-200 ${selectedFields.includes(header) ? 'scale-110' : ''}`}>
                   {selectedFields.includes(header) ? (
@@ -315,7 +352,7 @@ const ExcelUploader = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {parsedData.slice(0, 5).map((row, index) => (
-                  <tr 
+                  <tr
                     key={index}
                     className="hover:bg-gray-50 transition-colors duration-150"
                   >
