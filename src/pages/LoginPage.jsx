@@ -23,7 +23,7 @@ export default function LoginPage() {
             setLoading(false);
             if (username === 'test' && password === '1234') {
                 toast.success('Login Successful!');
-                localStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('isLoggedIn', 'true');
                 navigate('/');
             } else {
                 toast.error('Login Failed!');

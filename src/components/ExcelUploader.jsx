@@ -63,6 +63,11 @@ const ExcelUploader = () => {
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
+    const logout = () => {
+        sessionStorage.clear();
+        navigate("/login")
+    }
+
     const formatDecimalTime = (totalSeconds) => {
         const mins = Math.floor(totalSeconds / 60);
         const secs = (totalSeconds % 60).toFixed(2);
@@ -264,7 +269,7 @@ const ExcelUploader = () => {
                 </button>
                 <button
                     title='Logout'
-                    onClick={() => navigate('/login')}
+                    onClick={() => logout()}
                     className="px-4 py-2 bg-red-100 cursor-pointer text-red-700 rounded-lg hover:bg-red-200 text-sm"
                 >
                     Logout

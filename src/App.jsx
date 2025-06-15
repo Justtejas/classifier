@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import History from './pages/History';
 import ExcelUploader from '../src/components/ExcelUploader'
@@ -29,6 +29,7 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </div>
     );
