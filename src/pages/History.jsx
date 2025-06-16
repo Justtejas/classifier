@@ -53,7 +53,7 @@ const History = () => {
                                 <th className="px-4 py-3">Fields</th>
                                 <th className="px-4 py-3">Time Taken (s)</th>
                                 <th className="px-4 py-3">Processed At</th>
-                                <th className="px-4 py-3">Action</th>
+                                {/* <th className="px-4 py-3">Action</th> */}
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
@@ -70,7 +70,7 @@ const History = () => {
                                             {new Date(entry.processedAt).toLocaleString()}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3">
+                                    {/* <td className="px-4 py-3">
                                         <a
                                             href={entry.downloadUrl}
                                             download
@@ -79,7 +79,7 @@ const History = () => {
                                             <FiDownload className="mr-1" />
                                             Download
                                         </a>
-                                    </td>
+                                    </td> */}
                                 </tr>
                             ))}
                         </tbody>
