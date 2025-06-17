@@ -208,7 +208,7 @@ const ExcelUploader = () => {
                 <FiLoader className="animate-spin text-blue-600 w-6 h-6" />
                 <div>
                     <p className="text-gray-700 font-medium">Processing File</p>
-                    <p className="text-sm text-gray-500 mt-1">Elapsed Time: {formatTime(timer)}</p>
+                    <p className="text-sm text-gray-500 mt-1">Elapsed Time: {formatDecimalTime(timer)}</p>
                 </div>
             </div>
         </div>
@@ -229,7 +229,7 @@ const ExcelUploader = () => {
                 {icon}
                 <span>{message}</span>
                 {processingTime > 0 && messageType === 'success' && (
-                    <span className="ml-4 text-sm text-gray-600">Time Taken: {formatDecimalTime(processingTime)}</span>
+                    <span className="ml-4 text-sm text-gray-600">Time Taken: {formatTime(processingTime)}</span>
                 )}
                 <button
                     onClick={closeMessageBanner}
@@ -248,7 +248,7 @@ const ExcelUploader = () => {
             <DownloadModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                processingTime={processingTime}
+                processingTime={formatDecimalTime(processingTime)}
                 onDownload={handleDownload}
             />
             <div className="flex justify-end items-center space-x-4 mb-6">

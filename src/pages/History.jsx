@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FiDownload, FiClock, FiFileText, FiArrowLeft } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import { getHistory, downloadFile } from '../service/apiService';
 
 const History = () => {
     const [historyData, setHistoryData] = useState([]);
@@ -10,10 +11,12 @@ const History = () => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const response = await fetch('http://localhost:5000/history');
-                if (!response.ok) throw new Error('Failed to fetch history');
-                const data = await response.json();
+                const response = await getHistory();
+                console.log(response)
+                if (response.status !== 200) throw new Error('Failed to fetch history');
+                const data = await response.data;
                 setHistoryData(data.reverse());
+                console.log(historyData)
             } catch (error) {
                 console.error(error.message);
             } finally {
@@ -23,6 +26,25 @@ const History = () => {
 
         fetchHistory();
     }, []);
+
+    const download = async (fileId, fileName) => {
+        try {
+            const response = await downloadFile(fileId)
+            if (response.status !== 200) {
+                throw new Error('Network response was not ok');
+            }
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading the file:', error);
+        }
+    };
 
     return (
         <div className="max-w-5xl mx-auto p-8 bg-white rounded-xl shadow-md border border-gray-100 mt-6">
@@ -53,33 +75,32 @@ const History = () => {
                                 <th className="px-4 py-3">Fields</th>
                                 <th className="px-4 py-3">Time Taken (s)</th>
                                 <th className="px-4 py-3">Processed At</th>
-                                {/* <th className="px-4 py-3">Action</th> */}
+                                <th className="px-4 py-3">Action</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
                             {historyData.map((entry) => (
-                                <tr key={entry.id} className="hover:bg-gray-50">
-                                    <td className="px-4 py-3 font-medium text-gray-900">{entry.fileName}</td>
+                                <tr key={entry._id} className="hover:bg-gray-50">
+                                    <td className="px-4 py-3 font-medium text-gray-900">{entry["File name"]}</td>
                                     <td className="px-4 py-3 text-gray-700">
-                                        {entry.fieldsSelected?.join(', ') || 'N/A'}
+                                        {entry.Fields?.join(', ') || 'N/A'}
                                     </td>
-                                    <td className="px-4 py-3 text-gray-700">{entry.timeTaken}</td>
+                                    <td className="px-4 py-3 text-gray-700">{entry["Time taken"]}</td>
                                     <td className="px-4 py-3 text-gray-600">
                                         <span className="flex items-center">
                                             <FiClock className="mr-1 text-gray-400" />
-                                            {new Date(entry.processedAt).toLocaleString()}
+                                            {entry["Processed at"]}
                                         </span>
                                     </td>
-                                    {/* <td className="px-4 py-3">
-                                        <a
-                                            href={entry.downloadUrl}
-                                            download
+                                    <td className="px-4 py-3">
+                                        <button
+                                            onClick={() => download(entry._id, entry["File name"])}
                                             className="inline-flex items-center px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition text-xs"
                                         >
                                             <FiDownload className="mr-1" />
                                             Download
-                                        </a>
-                                    </td> */}
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -91,4 +112,3 @@ const History = () => {
 };
 
 export default History;
-
