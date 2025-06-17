@@ -3,6 +3,7 @@ import LoginPage from './pages/LoginPage';
 import History from './pages/History';
 import ExcelUploader from '../src/components/ExcelUploader'
 import ProtectedRoute from './components/ProtectedRoute';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
     return (
@@ -31,6 +32,7 @@ function App() {
                 />
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
+            <ToastContainer />
         </div>
     );
 }

@@ -1,22 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { FiDownload, FiClock, FiFileText, FiArrowLeft } from 'react-icons/fi';
+import { FiDownload, FiClock, FiFileText, FiArrowLeft, FiDelete } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import { getHistory, downloadFile } from '../service/apiService';
+import { toast } from 'react-toastify';
+import ConfirmationModal from '../components/ConfirmationModal';
+import { getHistory, downloadFile, deleteFileById } from '../service/apiService';
 
 const History = () => {
     const [historyData, setHistoryData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [fileIdToDelete, setFileIdToDelete] = useState(null);
+
     const navigate = useNavigate();
+
+
+    const formatDecimalTime = (totalSeconds) => {
+        const time = totalSeconds.slice(0, totalSeconds.length - 1)
+        const mins = Math.floor(time / 60);
+        const secs = (time % 60).toFixed(2);
+        return `${mins}:${secs.padStart(5, '0')}`;
+    };
+
+    const handleDeleteClick = (fileId) => {
+        setFileIdToDelete(fileId);
+        setIsModalOpen(true);
+    };
+    const handleConfirmDelete = async () => {
+        try {
+            await deleteFileById(fileIdToDelete);
+            toast.success("File deleted successfully")
+            const response = await getHistory();
+            if (response.status === 200) {
+                const data = await response.data;
+                setHistoryData(data.reverse());
+            }
+        } catch (error) {
+            toast.error(error.message)
+        } finally {
+            setIsModalOpen(false);
+            setFileIdToDelete(null);
+        }
+    };
 
     useEffect(() => {
         const fetchHistory = async () => {
             try {
                 const response = await getHistory();
-                console.log(response)
                 if (response.status !== 200) throw new Error('Failed to fetch history');
                 const data = await response.data;
                 setHistoryData(data.reverse());
-                console.log(historyData)
             } catch (error) {
                 console.error(error.message);
             } finally {
@@ -73,9 +105,10 @@ const History = () => {
                             <tr>
                                 <th className="px-4 py-3">File Name</th>
                                 <th className="px-4 py-3">Fields</th>
-                                <th className="px-4 py-3">Time Taken (s)</th>
+                                <th className="px-4 py-3">Time Taken</th>
                                 <th className="px-4 py-3">Processed At</th>
-                                <th className="px-4 py-3">Action</th>
+                                <th className="px-4 py-3">Download</th>
+                                <th className="px-4 py-3">Delete</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
@@ -85,7 +118,7 @@ const History = () => {
                                     <td className="px-4 py-3 text-gray-700">
                                         {entry.Fields?.join(', ') || 'N/A'}
                                     </td>
-                                    <td className="px-4 py-3 text-gray-700">{entry["Time taken"]}</td>
+                                    <td className="px-4 py-3 text-gray-700">{formatDecimalTime(entry["Time taken"])} mins</td>
                                     <td className="px-4 py-3 text-gray-600">
                                         <span className="flex items-center">
                                             <FiClock className="mr-1 text-gray-400" />
@@ -101,12 +134,27 @@ const History = () => {
                                             Download
                                         </button>
                                     </td>
+                                    <td className="px-4 py-3">
+                                        <button
+
+                                            onClick={() => handleDeleteClick(entry._id)}
+                                            className="inline-flex items-center px-3 py-1 bg-red-500 text-white rounded hover:bg-red-800 transition text-xs"
+                                        >
+                                            <FiDelete className="mr-1" />
+                                            Delete
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             )}
+            <ConfirmationModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+            />
         </div>
     );
 };

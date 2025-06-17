@@ -208,7 +208,7 @@ const ExcelUploader = () => {
                 <FiLoader className="animate-spin text-blue-600 w-6 h-6" />
                 <div>
                     <p className="text-gray-700 font-medium">Processing File</p>
-                    <p className="text-sm text-gray-500 mt-1">Elapsed Time: {formatDecimalTime(timer)}</p>
+                    <p className="text-sm text-gray-500 mt-1">Elapsed Time: {formatTime(timer)}</p>
                 </div>
             </div>
         </div>

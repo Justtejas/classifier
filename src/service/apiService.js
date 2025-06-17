@@ -57,3 +57,18 @@ export const downloadFile = async (fileId) => {
         throw new Error(errorMessage);
     }
 };
+
+export const deleteFileById = async (fileId) => {
+    try {
+        const response = await axios.get(`http://localhost:9092/api/files/${fileId}/delete`);
+        return response;
+    } catch (error) {
+        let errorMessage = 'Error downloading file, please try again later.';
+        if (error.response) {
+            errorMessage = `Error ${error.response.status}: ${error.response.data}`;
+        } else if (error.request) {
+            errorMessage = 'Network error. Please check your connection.';
+        }
+        throw new Error(errorMessage);
+    }
+};
