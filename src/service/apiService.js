@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from './api';
 
 export const classifyExcelFile = async (file, selectedFields) => {
     const formData = new FormData();
@@ -8,7 +8,7 @@ export const classifyExcelFile = async (file, selectedFields) => {
     });
 
     try {
-        const response = await axios.post('http://localhost:9092/api/classify', formData, {
+        const response = await api.post('/classify', formData, {
             responseType: 'blob',
         });
         console.log(response)
@@ -27,7 +27,7 @@ export const classifyExcelFile = async (file, selectedFields) => {
 
 export const getHistory = async () => {
     try {
-        const response = await axios.get('http://localhost:9092/api/files');
+        const response = await api.get('/files');
         return response;
     } catch (error) {
         let errorMessage = 'Error getting history, please try again.';
@@ -43,7 +43,7 @@ export const getHistory = async () => {
 
 export const downloadFile = async (fileId) => {
     try {
-        const response = await axios.get(`http://localhost:9092/api/files/${fileId}/download`, {
+        const response = await api.get(`/files/${fileId}/download`, {
             responseType: 'blob'
         });
         return response;
@@ -60,7 +60,7 @@ export const downloadFile = async (fileId) => {
 
 export const deleteFileById = async (fileId) => {
     try {
-        const response = await axios.get(`http://localhost:9092/api/files/${fileId}/delete`);
+        const response = await api.get(`/files/${fileId}/delete`);
         return response;
     } catch (error) {
         let errorMessage = 'Error downloading file, please try again later.';

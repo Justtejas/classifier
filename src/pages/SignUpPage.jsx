@@ -1,48 +1,52 @@
-import React, { useState } from 'react';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import { login } from '../service/authService';
-import { useAuth } from '../context/AuthContext';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { signUp } from "../service/authService";
 
-export default function LoginPage() {
-    const [email, setEmail] = useState('');
-    const { setToken } = useAuth()
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
+export default function Signup() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
+
     const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const validatePassword = (password) =>
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password);
 
-    const handleLogin = async (e) => {
+    const handleSignup = async (e) => {
         e.preventDefault();
-        setLoading(true);
         if (!validateEmail(email)) {
-            toast.error("Invalid email format");
+            toast.error("Email must be a valid email address");
             return;
         }
-
-        if (!email || !password) {
-            toast.error('Please fill in all fields');
+        if (!validatePassword(password)) {
+            toast.error("Password must be 8+ chars with upper, lower, number, and symbol");
             return;
         }
-
         try {
-            const token = await login({ email, password })
-            console.log(token)
-            setToken(token)
-            localStorage.setItem("token", token)
-            navigate("/")
-        } catch (error) {
-            toast.error("Login failed. Please try again.");
-        }
-        finally {
-            setLoading(false)
+            setLoading(true);
+            const response = await signUp({ email, password })
+            console.log(response)
+            if (response) {
+                toast.success("Account created successfully. Redirecting to  login.", { autoClose: 1800 });
+                setTimeout(() => {
+                    navigate("/login");
+                }, 2000)
+            }
+        } catch (err) {
+            toast.error(err.response?.data?.error);
+        } finally {
+            setTimeout(() => {
+                setLoading(false)
+            }, 1500);
         }
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-300/80 to-pink-400/80 p-4">
-            <div className="bg-white shadow-lg rounded-2xl w-full max-w-md p-8">
+            <div className="bg-white rounded-2xl shadow-md w-full max-w-md p-6 space-y-4">
+
                 <div className="flex justify-center mb-6">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -54,10 +58,9 @@ export default function LoginPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </div>
-                <h2 className="text-3xl font-bold text-center text-blue-900 mb-2">Welcome Back!</h2>
-                <p className="text-center text-blue-700 mb-6">Please log in to continue</p>
-
-                <form onSubmit={handleLogin} className="space-y-5">
+                <h2 className="text-3xl font-bold text-center text-blue-900 mb-2">Welcome</h2>
+                <p className="text-center text-blue-700 mb-6">Please sign up to continue</p>
+                <form onSubmit={handleSignup} className="space-y-5">
                     <div>
                         <label className="block text-blue-800 font-medium mb-1">Email</label>
                         <input
@@ -92,7 +95,9 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-xl transition-all duration-300 flex justify-center"
+                        className="w-full bg-teal-600 hover:bg-teal-700 text-white
+                    font-bold py-3 rounded-xl transition-all duration-300 flex
+                    justify-center"
                     >
                         {loading ? (
                             <svg
@@ -116,22 +121,22 @@ export default function LoginPage() {
                                 />
                             </svg>
                         ) : (
-                            'Log In'
+                            'Sign up'
                         )}
                     </button>
+
                 </form>
 
                 <div className="text-center mt-4">
-                    <span className="text-blue-700">Don't have an account?</span>
+                    <span className="text-blue-700">Log in instead?</span>
                     <button
-                        onClick={() => navigate("/signup")}
+                        onClick={() => navigate("/login")}
                         className="ml-1 text-teal-600 font-bold"
                     >
-                        Sign up
+                        Log In
                     </button>
                 </div>
             </div>
         </div>
     );
 }
-

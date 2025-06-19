@@ -13,6 +13,7 @@ import {
     FiFile
 } from 'react-icons/fi';
 import { classifyExcelFile } from '../service/apiService';
+import { toast } from 'react-toastify';
 
 const ExcelUploader = () => {
     const [parsedData, setParsedData] = useState([]);
@@ -64,7 +65,7 @@ const ExcelUploader = () => {
     };
 
     const logout = () => {
-        sessionStorage.clear();
+        localStorage.clear();
         navigate("/login")
     }
 

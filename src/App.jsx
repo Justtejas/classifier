@@ -4,8 +4,12 @@ import History from './pages/History';
 import ExcelUploader from '../src/components/ExcelUploader'
 import ProtectedRoute from './components/ProtectedRoute';
 import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Signup from './pages/SignUpPage';
+import { useAuth } from './context/AuthContext';
 
 function App() {
+    const {token} = useAuth();
     return (
         <div className='bg-gray-800 min-h-screen'>
             <Routes>
@@ -13,7 +17,7 @@ function App() {
                 <Route
                     path="/"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute token={token}>
                             <div className='py-8'>
                                 <ExcelUploader />
                             </div>
@@ -23,11 +27,19 @@ function App() {
                 <Route
                     path="/history"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute token={token}>
                             <div className='py-8'>
                                 <History />
                             </div>
                         </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/signup"
+                    element={
+                        <div>
+                            <Signup />
+                        </div>
                     }
                 />
                 <Route path="*" element={<Navigate to="/login" replace />} />
