@@ -247,7 +247,10 @@ const ExcelUploader = () => {
             {loading && <Loader />}
             <DownloadModal
                 isOpen={isModalOpen}
-                onClose={() => { setIsModalOpen(false); resetState() }}
+                onClose={() => {
+                    resetState();
+                    setIsModalOpen(false);
+                }}
                 processingTime={formatDecimalTime(processingTime)}
                 onDownload={handleDownload}
             />
