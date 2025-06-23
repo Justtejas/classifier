@@ -16,9 +16,7 @@ export const login = async ({ email, password }) => {
         }
     } catch (error) {
         const errorMessage = error.response?.data?.error || error.message || "An unexpected error occurred.";
-        toast.error(errorMessage);
-        console.error("Login error:", error);
-        throw error;
+        throw errorMessage;
     }
 };
 
@@ -37,8 +35,6 @@ export const signUp = async ({ email, password }) => {
         }
     } catch (error) {
         const errorMessage = error.response?.data?.error || error.message || "An unexpected error occurred.";
-        toast.error(errorMessage);
-        console.error("Sign-up error:", error);
-        throw error;
+        throw errorMessage;
     }
 };

@@ -16,24 +16,26 @@ export default function LoginPage() {
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
-        if (!validateEmail(email)) {
-            toast.error("Invalid email format");
-            return;
-        }
 
         if (!email || !password) {
             toast.error('Please fill in all fields');
+            setLoading(false)
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            toast.error("Invalid email format");
+            setLoading(false)
             return;
         }
 
         try {
             const token = await login({ email, password })
-            console.log(token)
             setToken(token)
             localStorage.setItem("token", token)
             navigate("/")
         } catch (error) {
-            toast.error("Login failed. Please try again.");
+            toast.error(error);
         }
         finally {
             setLoading(false)

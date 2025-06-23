@@ -11,7 +11,6 @@ export const classifyExcelFile = async (file, selectedFields) => {
         const response = await api.post('/classify', formData, {
             responseType: 'blob',
         });
-        console.log(response)
         return response.data;
     } catch (error) {
         let errorMessage = 'Error processing the file. Please try again.';

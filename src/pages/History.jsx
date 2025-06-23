@@ -50,7 +50,7 @@ const History = () => {
                 const data = await response.data;
                 setHistoryData(data.reverse());
             } catch (error) {
-                console.error(error.message);
+                toast.error(error)
             } finally {
                 setLoading(false);
             }
@@ -74,8 +74,9 @@ const History = () => {
             a.remove();
             window.URL.revokeObjectURL(url);
         } catch (error) {
-            console.error('Error downloading the file:', error);
+            toast.error(error)
         }
+
     };
 
     return (
@@ -96,8 +97,39 @@ const History = () => {
 
             {loading ? (
                 <div className="text-gray-600">Loading history...</div>
-            ) : historyData.length === 0 ? (
-                <p className="text-gray-500">No processed files found.</p>
+            ) : historyData.length <= 0 ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-32 w-32 text-gray-300 mb-6"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+                        />
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 11v3m0 0v3m0-3h3m-3 0H9"
+                            opacity="0.5"
+                        />
+                    </svg>
+                    <h3 className="text-xl font-medium text-gray-500 mb-2">No Files Processed Yet</h3>
+                    <p className="text-gray-400 max-w-md text-center">
+                        Your processed files will appear here. Start by uploading an excel sheet to get started.
+                    </p>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="mt-6 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                        Upload First File
+                    </button>
+                </div>
             ) : (
                 <div className="overflow-x-auto">
                     <table className="min-w-full text-sm text-left border border-gray-200 rounded-lg">

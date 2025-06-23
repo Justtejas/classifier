@@ -16,6 +16,13 @@ export default function Signup() {
 
     const handleSignup = async (e) => {
         e.preventDefault();
+
+        if (!email || !password) {
+            toast.error('Please fill in all fields');
+            setLoading(false)
+            return;
+        }
+
         if (!validateEmail(email)) {
             toast.error("Email must be a valid email address");
             return;
@@ -27,7 +34,6 @@ export default function Signup() {
         try {
             setLoading(true);
             const response = await signUp({ email, password })
-            console.log(response)
             if (response) {
                 toast.success("Account created successfully. Redirecting to  login.", { autoClose: 1800 });
                 setTimeout(() => {
@@ -35,7 +41,7 @@ export default function Signup() {
                 }, 2000)
             }
         } catch (err) {
-            toast.error(err.response?.data?.error);
+            toast.error(err);
         } finally {
             setTimeout(() => {
                 setLoading(false)

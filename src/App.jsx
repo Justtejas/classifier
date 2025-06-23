@@ -9,7 +9,7 @@ import Signup from './pages/SignUpPage';
 import { useAuth } from './context/AuthContext';
 
 function App() {
-    const {token} = useAuth();
+    const { token } = useAuth();
     return (
         <div className='bg-gray-800 min-h-screen'>
             <Routes>
@@ -44,7 +44,7 @@ function App() {
                 />
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
-            <ToastContainer />
+            <ToastContainer autoClose={1300} pauseOnFocusLoss={false} pauseOnHover={false} newestOnTop />
         </div>
     );
 }
