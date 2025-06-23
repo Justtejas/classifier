@@ -13,7 +13,6 @@ import {
     FiFile
 } from 'react-icons/fi';
 import { classifyExcelFile } from '../service/apiService';
-import { toast } from 'react-toastify';
 
 const ExcelUploader = () => {
     const [parsedData, setParsedData] = useState([]);
@@ -248,7 +247,7 @@ const ExcelUploader = () => {
             {loading && <Loader />}
             <DownloadModal
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={() => { setIsModalOpen(false); resetState() }}
                 processingTime={formatDecimalTime(processingTime)}
                 onDownload={handleDownload}
             />

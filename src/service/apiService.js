@@ -27,6 +27,9 @@ export const classifyExcelFile = async (file, selectedFields) => {
 export const getHistory = async () => {
     try {
         const response = await api.get('/files');
+        if(response.status === 404){
+            return new Array([])
+        }
         return response;
     } catch (error) {
         let errorMessage = 'Error getting history, please try again.';
@@ -59,7 +62,7 @@ export const downloadFile = async (fileId) => {
 
 export const deleteFileById = async (fileId) => {
     try {
-        const response = await api.get(`/files/${fileId}/delete`);
+        const response = await api.delete(`/files/${fileId}/delete`);
         return response;
     } catch (error) {
         let errorMessage = 'Error downloading file, please try again later.';

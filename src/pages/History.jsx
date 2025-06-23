@@ -8,6 +8,7 @@ import { getHistory, downloadFile, deleteFileById } from '../service/apiService'
 const History = () => {
     const [historyData, setHistoryData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refresh, setRefresh] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fileIdToDelete, setFileIdToDelete] = useState(null);
 
@@ -28,36 +29,31 @@ const History = () => {
     const handleConfirmDelete = async () => {
         try {
             await deleteFileById(fileIdToDelete);
-            toast.success("File deleted successfully")
-            const response = await getHistory();
-            if (response.status === 200) {
-                const data = await response.data;
-                setHistoryData(data.reverse());
-            }
+            toast.success("File deleted successfully");
+            setHistoryData(prevData => prevData.filter(entry => entry._id !== fileIdToDelete)); // Remove the deleted file from state
         } catch (error) {
-            toast.error(error.message)
+            // Handle error
         } finally {
             setIsModalOpen(false);
             setFileIdToDelete(null);
         }
     };
 
+    const fetchHistory = async () => {
+        try {
+            const response = await getHistory();
+            if (response.status !== 200) throw new Error('Failed to fetch history');
+            const data = await response.data;
+            setHistoryData(data.reverse());
+        } catch (error) {
+            toast.error(error)
+        } finally {
+            setLoading(false);
+        }
+    };
     useEffect(() => {
-        const fetchHistory = async () => {
-            try {
-                const response = await getHistory();
-                if (response.status !== 200) throw new Error('Failed to fetch history');
-                const data = await response.data;
-                setHistoryData(data.reverse());
-            } catch (error) {
-                toast.error(error)
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchHistory();
-    }, []);
+    }, [refresh]);
 
     const download = async (fileId, fileName) => {
         try {
